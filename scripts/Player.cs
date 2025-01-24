@@ -187,6 +187,13 @@ public partial class Player : CharacterBody2D
 
 	private void StartDash(Vector2 direction)
 	{
+		// Cancel attack if currently attacking
+		if (_isAttacking)
+		{
+			_isAttacking = false;
+			_animationPlayer.AnimationFinished -= OnAttackAnimationFinished;
+		}
+
 		if (_isDashing)
 		{
 			return; // Prevent starting another dash while already dashing
@@ -195,11 +202,25 @@ public partial class Player : CharacterBody2D
 		_isDashing = true;
 		_dashTimeLeft = DashDuration;
 		_dashDirection = direction.Normalized();
-		_animationPlayer?.Play("dash");
+		
+		if (IsOnFloor())
+		{
+			_animationPlayer?.Play("roll");
+		}
+		else
+		{
+			_animationPlayer?.Play("dash");
+		}
 	}
 
 	private void PerformAttack()
 	{
+		// Cancel dash if currently dashing
+		if (_isDashing)
+		{
+			_isDashing = false;
+		}
+
 		if (!_isAttacking)
 		{
 			_isAttacking = true;
