@@ -17,7 +17,13 @@ public partial class Player : CharacterBody2D
 	private bool _isAttacking = false;
 	private float _attackCooldown = 0.1f;
 	private float _attackCooldownTimer = 0;
-
+	private string[] _attackAnimations = { 
+		"attack_basic", 
+		"attack_crush", 
+		"attack_stab" 
+	};
+	private int _currentAttackIndex = 0;
+	
 	// Landing-related variables
 	private bool _wasOnFloor = true;
 	private bool _isLanding = false;
@@ -143,7 +149,7 @@ public partial class Player : CharacterBody2D
 
 			if (!_isAttacking && IsOnFloor())
 			{
-				_animationPlayer?.Play("run");
+				_animationPlayer?.Play("run_katana");
 			}
 		}
 		else if (IsOnFloor() && !_isLanding)
@@ -209,10 +215,10 @@ public partial class Player : CharacterBody2D
 		}
 		else
 		{
-			_animationPlayer?.Play("dash");
+			_animationPlayer?.Play("spin");
 		}
 	}
-
+	
 	private void PerformAttack()
 	{
 		// Cancel dash if currently dashing
@@ -228,7 +234,11 @@ public partial class Player : CharacterBody2D
 			Vector2 mousePosition = GetGlobalMousePosition();
 			_animationPlayer.FlipH = mousePosition.X < GlobalPosition.X;
 
-			_animationPlayer?.Play("attack");
+			// Play the current attack animation
+			_animationPlayer?.Play(_attackAnimations[_currentAttackIndex]);
+
+			// Increment and wrap around the attack index
+			_currentAttackIndex = (_currentAttackIndex + 1) % _attackAnimations.Length;
 
 			_animationPlayer.AnimationFinished += OnAttackAnimationFinished;
 		}
