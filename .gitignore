@@ -1,0 +1,16 @@
+# Godot 4+ specific ignores
+# Godot-specific files
+.import/
+.mono/
+.mono_temp/
+.godot/
+
+# C# build artifacts
+*.csproj
+*.sln
+*.dll
+*.exe
+
+# User-specific files
+*.tmp
+*.log
