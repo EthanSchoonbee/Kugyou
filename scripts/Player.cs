@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class Player : CharacterBody2D
 {
@@ -17,10 +18,14 @@ public partial class Player : CharacterBody2D
 	private bool _isAttacking = false;
 	private float _attackCooldown = 0.1f;
 	private float _attackCooldownTimer = 0;
-	private string[] _attackAnimations = { 
-		"attack_basic", 
-		"attack_crush", 
-		"attack_stab" 
+	private List<AttackPattern> _attackPatterns = new List<AttackPattern>
+	{
+		new AttackPattern("attack_continiously", 0.1f, 10),
+		new AttackPattern("attack_continiously", 0.1f, 11),
+		new AttackPattern("attack_crush", 0.3f, 25),
+		new AttackPattern("attack_continiously", 0.1f, 12),
+		new AttackPattern("attack_continiously", 0.1f, 13),
+		new AttackPattern("attack_stab", 0.2f, 20),
 	};
 	private int _currentAttackIndex = 0;
 	
@@ -234,11 +239,15 @@ public partial class Player : CharacterBody2D
 			Vector2 mousePosition = GetGlobalMousePosition();
 			_animationPlayer.FlipH = mousePosition.X < GlobalPosition.X;
 
+			var attack = _attackPatterns[_currentAttackIndex];
+
 			// Play the current attack animation
-			_animationPlayer?.Play(_attackAnimations[_currentAttackIndex]);
+			_animationPlayer?.Play(attack.AnimationName);
+			
+			_attackCooldown = attack.Cooldown;
 
 			// Increment and wrap around the attack index
-			_currentAttackIndex = (_currentAttackIndex + 1) % _attackAnimations.Length;
+			_currentAttackIndex = (_currentAttackIndex + 1) % _attackPatterns.Count;
 
 			_animationPlayer.AnimationFinished += OnAttackAnimationFinished;
 		}
@@ -278,5 +287,19 @@ public partial class Player : CharacterBody2D
 	private void OnLandingAnimationFinished()
 	{
 		_isLanding = false;
+	}
+}
+
+public class AttackPattern
+{
+	public string AnimationName { get; set; }
+	public float Cooldown { get; set; }
+	public int Damage { get; set; }
+
+	public AttackPattern(string animationName, float cooldown, int damage)
+	{
+		AnimationName = animationName;
+		Cooldown = cooldown;
+		Damage = damage;
 	}
 }

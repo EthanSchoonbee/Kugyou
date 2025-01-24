@@ -758,13 +758,13 @@ animations = [{
 "speed": 13.0
 }, {
 "frames": [{
-"duration": 0.4,
+"duration": 0.2,
 "texture": SubResource("AtlasTexture_pslxo")
 }, {
-"duration": 0.7,
+"duration": 0.4,
 "texture": SubResource("AtlasTexture_mrx1d")
 }, {
-"duration": 0.7,
+"duration": 0.6,
 "texture": SubResource("AtlasTexture_kllhm")
 }, {
 "duration": 0.7,
@@ -1255,8 +1255,6 @@ position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_oospq")
 animation = &"attack_air"
 autoplay = "idle"
-frame = 2
-frame_progress = 0.743053
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -11)
