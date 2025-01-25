@@ -754,7 +754,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_38muq")
 }],
 "loop": false,
-"name": &"attack_continiously",
+"name": &"attack_continuously",
 "speed": 13.0
 }, {
 "frames": [{
@@ -1126,7 +1126,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"run_katana",
-"speed": 6.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1253,7 +1253,7 @@ script = ExtResource("1_mux3i")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_oospq")
-animation = &"attack_air"
+animation = &"attack_stab"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -1,12 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+namespace Kugyou.scripts;
 
-public partial class Player : CharacterBody2D
+public partial class Player: CharacterBody2D
 {
 	// Player stat-related variables
 	public const float Speed = 200.0f;
-	public const float JumpVelocity = -300.0f;
+	public const float JumpVelocity = -350.0f;
+	public const float FallMultiplier = 1.5f;
 	public const float DashSpeed = 300.0f;
 	public const float DashDuration = 0.3f; // Converted to seconds
 	public const float DoubleTapTime = 0.3f; // Max time between taps (seconds)
@@ -20,15 +22,15 @@ public partial class Player : CharacterBody2D
 	private float _attackCooldownTimer = 0;
 	private List<AttackPattern> _attackPatterns = new List<AttackPattern>
 	{
-		new AttackPattern("attack_continiously", 0.1f, 10),
-		new AttackPattern("attack_continiously", 0.1f, 11),
+		new AttackPattern("attack_continuously", 0.1f, 10),
+		new AttackPattern("attack_continuously", 0.1f, 11),
 		new AttackPattern("attack_crush", 0.3f, 25),
-		new AttackPattern("attack_continiously", 0.1f, 12),
-		new AttackPattern("attack_continiously", 0.1f, 13),
+		new AttackPattern("attack_continuously", 0.1f, 12),
+		new AttackPattern("attack_continuously", 0.1f, 13),
 		new AttackPattern("attack_stab", 0.2f, 20),
 	};
 	private int _currentAttackIndex = 0;
-	
+
 	// Landing-related variables
 	private bool _wasOnFloor = true;
 	private bool _isLanding = false;
@@ -86,7 +88,7 @@ public partial class Player : CharacterBody2D
 		// Add gravity if not on floor
 		if (!IsOnFloor())
 		{
-			velocity += GetGravity() * (float)delta;
+			velocity += GetGravity() * FallMultiplier * (float)delta;
 		}
 
 		// Handle attack input
@@ -150,11 +152,14 @@ public partial class Player : CharacterBody2D
 		{
 			velocity.X = direction.X * Speed;
 
-			_animationPlayer.FlipH = direction.X < 0;
-
-			if (!_isAttacking && IsOnFloor())
+			if (_animationPlayer != null)
 			{
-				_animationPlayer?.Play("run_katana");
+				_animationPlayer.FlipH = direction.X < 0;
+
+				if (!_isAttacking && IsOnFloor())
+				{
+					_animationPlayer?.Play("run_katana");
+				}
 			}
 		}
 		else if (IsOnFloor() && !_isLanding)
@@ -213,7 +218,7 @@ public partial class Player : CharacterBody2D
 		_isDashing = true;
 		_dashTimeLeft = DashDuration;
 		_dashDirection = direction.Normalized();
-		
+
 		if (IsOnFloor())
 		{
 			_animationPlayer?.Play("roll");
@@ -223,7 +228,7 @@ public partial class Player : CharacterBody2D
 			_animationPlayer?.Play("spin");
 		}
 	}
-	
+
 	private void PerformAttack()
 	{
 		// Cancel dash if currently dashing
@@ -243,16 +248,16 @@ public partial class Player : CharacterBody2D
 
 			// Play the current attack animation
 			_animationPlayer?.Play(attack.AnimationName);
-			
+
 			_attackCooldown = attack.Cooldown;
 
 			// Increment and wrap around the attack index
 			_currentAttackIndex = (_currentAttackIndex + 1) % _attackPatterns.Count;
 
-			_animationPlayer.AnimationFinished += OnAttackAnimationFinished;
+			if (_animationPlayer != null) _animationPlayer.AnimationFinished += OnAttackAnimationFinished;
 		}
 	}
-	
+
 	private void UpdateFacingDirection()
 	{
 		// Only update the direction when not attacking
@@ -272,7 +277,7 @@ public partial class Player : CharacterBody2D
 		else
 			_animationPlayer?.Play("idle");
 
-		_animationPlayer.AnimationFinished -= OnAttackAnimationFinished;
+		if (_animationPlayer != null) _animationPlayer.AnimationFinished -= OnAttackAnimationFinished;
 	}
 
 	private void TriggerLandingAnimation()
@@ -287,19 +292,5 @@ public partial class Player : CharacterBody2D
 	private void OnLandingAnimationFinished()
 	{
 		_isLanding = false;
-	}
-}
-
-public class AttackPattern
-{
-	public string AnimationName { get; set; }
-	public float Cooldown { get; set; }
-	public int Damage { get; set; }
-
-	public AttackPattern(string animationName, float cooldown, int damage)
-	{
-		AnimationName = animationName;
-		Cooldown = cooldown;
-		Damage = damage;
 	}
 }
